@@ -47,14 +47,52 @@ coverage/
 *.rpm
 *.zip
 *.tar.gz
+*.pkg
+*.msi
+
+# Electron cache and temporary files
+.electron/
+electron-cache/
+out/
+build/
 
 # Cache directories
 .npm-cache/
 .cache/
+.yarn-cache/
 
 # Qoder files
 .qoder/
 
 # Data files (if they contain sensitive information)
 baolike-data.json
-node_modules
+
+# Development temporary files
+*.swp
+*.swo
+*~
+
+# TypeScript build output
+*.tsbuildinfo
+
+# Vite cache
+.vite/cache/
+
+# IDE specific
+*.iml
+*.ipr
+*.iws
+
+# System files
+*.bak
+*.backup
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows specific
+nul
+
