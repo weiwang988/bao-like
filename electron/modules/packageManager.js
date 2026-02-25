@@ -804,31 +804,53 @@ module.exports = function setupPackageManager(logger) {
 
     const totalStartTime = Date.now()
     
-    await Promise.all(managers.map(async (mgr) => {
+    // 逐个扫描而不是并行扫描，以便实时更新日志
+    for (const mgr of managers) {
       const mgrStartTime = Date.now()
-      scanDetails.push(`\n[${mgr.toUpperCase()}] 开始检测缓存目录`)
+      const logMessage = `[${mgr.toUpperCase()}] 开始检测缓存目录`
+      scanDetails.push(`\n${logMessage}`)
+      addLog('info', 'cache', logMessage, '')
       
       try {
         const cachePath = await getCachePath(mgr, scanDetails)
         const mgrDuration = Date.now() - mgrStartTime
         
-        if (cachePath && fs.existsSync(cachePath)) {
-          const size = getDirSize(cachePath)
-          results.push({ manager: mgr, path: cachePath, size, available: true })
-          scanDetails.push(`[${mgr.toUpperCase()}] 检测完成: 成功 (耗时: ${mgrDuration}ms)`)
-          scanDetails.push(`  缓存路径: ${cachePath}`)
-          scanDetails.push(`  缓存大小: ${(size / 1024 / 1024).toFixed(2)} MB`)
+        if (cachePath) {
+          // 对于某些包管理器（如npm），即使缓存目录不存在，只要能获取到配置路径，也认为它是可用的
+          // 因为目录可能尚未创建，但工具本身是配置好的
+          if (fs.existsSync(cachePath)) {
+            const size = getDirSize(cachePath)
+            results.push({ manager: mgr, path: cachePath, size, available: true })
+            const successMessage = `[${mgr.toUpperCase()}] 检测完成: 成功 (耗时: ${mgrDuration}ms)`
+            scanDetails.push(successMessage)
+            scanDetails.push(`  缓存路径: ${cachePath}`)
+            scanDetails.push(`  缓存大小: ${(size / 1024 / 1024).toFixed(2)} MB`)
+            addLog('info', 'cache', successMessage, `缓存路径: ${cachePath}\n缓存大小: ${(size / 1024 / 1024).toFixed(2)} MB`)
+          } else {
+            // 对于所有包管理器，即使路径不存在，只要命令能返回路径，就认为工具可用，只是没有缓存
+            // 因为这些工具可能已安装配置好，但用户尚未使用或缓存已被清理
+            results.push({ manager: mgr, path: cachePath, size: 0, available: true })
+            const configMessage = `[${mgr.toUpperCase()}] 检测完成: 已配置但缓存目录不存在 (耗时: ${mgrDuration}ms)`
+            scanDetails.push(configMessage)
+            scanDetails.push(`  配置路径: ${cachePath}`)
+            scanDetails.push(`  缓存大小: 0 MB`)
+            addLog('warn', 'cache', configMessage, `配置路径: ${cachePath}`)
+          }
         } else {
           results.push({ manager: mgr, path: '', size: 0, available: false })
-          scanDetails.push(`[${mgr.toUpperCase()}] 检测完成: 未找到 (耗时: ${mgrDuration}ms)`)
+          const notFoundMessage = `[${mgr.toUpperCase()}] 检测完成: 未找到 (耗时: ${mgrDuration}ms)`
+          scanDetails.push(notFoundMessage)
+          addLog('warn', 'cache', notFoundMessage, '')
         }
       } catch (e) {
         const mgrDuration = Date.now() - mgrStartTime
         results.push({ manager: mgr, path: '', size: 0, available: false })
-        scanDetails.push(`[${mgr.toUpperCase()}] 检测完成: 异常 (耗时: ${mgrDuration}ms)`)
+        const errorMessage = `[${mgr.toUpperCase()}] 检测完成: 异常 (耗时: ${mgrDuration}ms)`
+        scanDetails.push(errorMessage)
         scanDetails.push(`  错误信息: ${e.message}`)
+        addLog('error', 'cache', errorMessage, `错误信息: ${e.message}`)
       }
-    }))
+    }
 
     const totalDuration = Date.now() - totalStartTime
     const availableCount = results.filter(r => r.available).length
@@ -837,7 +859,8 @@ module.exports = function setupPackageManager(logger) {
     scanDetails.push(`总耗时: ${totalDuration}ms`)
     scanDetails.push(`成功检测: ${availableCount}/${managers.length} 个包管理器`)
     
-    addLog('info', 'cache', `包缓存扫描完成: 找到 ${availableCount}/${managers.length} 个`, scanDetails.join('\n'))
+    const finalMessage = `包缓存扫描完成: 找到 ${availableCount}/${managers.length} 个`
+    addLog('info', 'cache', finalMessage, scanDetails.join('\n'))
 
     return { success: true, caches: results }
   })

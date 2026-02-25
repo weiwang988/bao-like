@@ -8,6 +8,9 @@
     "preview": "vite preview",
     "electron:dev": "concurrently \"vite\" \"wait-on tcp:5173 && cross-env NODE_ENV=development electron .\"",
     "electron:build": "npm run build && electron-builder",
+    "build:installer": "npm run build && electron-builder --win --x64",
+    "build:portable": "npm run build && electron-builder --win --x64 --dir",
+    "build:single-exe": "npm run build && electron-builder --win --x64 --config.win.target=portable",
     "typecheck": "vue-tsc --noEmit"
   },
   "keywords": [],
@@ -48,9 +51,21 @@
       "public/icon.ico"
     ],
     "win": {
-      "target": "dir",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
       "icon": "public/icon.ico",
       "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "BaoLike"
     }
   }
 }

@@ -146,13 +146,27 @@ ipcMain.handle('open-external', async (event, url) => {
 })
 
 // 执行命令获取版本信息
-ipcMain.handle('exec-command', (event, command) => {
+ipcMain.handle('exec-command', async (event, command) => {
   return new Promise((resolve) => {
-    exec(command, { timeout: 10000, encoding: 'utf8' }, (error, stdout, stderr) => {
+    // 对于Windows系统，使用正确的编码
+    const options = {
+      timeout: 10000,
+      encoding: 'utf8',
+      // Windows系统使用GBK编码处理中文
+      ...(process.platform === 'win32' && { 
+        env: { ...process.env, LANG: 'zh_CN.UTF-8' }
+      })
+    };
+    
+    exec(command, options, (error, stdout, stderr) => {
       if (error) {
+        console.log(`Command failed: ${command}`, error.message);
         resolve({ success: false, output: '', error: error.message })
       } else {
-        resolve({ success: true, output: stdout || stderr, error: '' })
+        // 处理可能的编码问题
+        let output = stdout || stderr;
+        console.log(`Command succeeded: ${command}`, output);
+        resolve({ success: true, output: output, error: '' })
       }
     })
   })
@@ -161,12 +175,63 @@ ipcMain.handle('exec-command', (event, command) => {
 // 获取系统信息
 ipcMain.handle('get-system-info', async () => {
   const os = require('os')
+  
+  // 获取详细的Windows版本信息
+  let detailedOSVersion = '';
+  if (process.platform === 'win32') {
+    try {
+      const { execSync } = require('child_process');
+      // 使用WMIC获取详细的Windows版本信息
+      const wmicOutput = execSync('wmic os get Caption,Version /value', { 
+        encoding: 'utf8',
+        timeout: 5000,
+        windowsHide: true
+      });
+      
+      const lines = wmicOutput.split('\n').filter(line => line.trim());
+      let caption = '';
+      let version = '';
+      
+      lines.forEach(line => {
+        if (line.startsWith('Caption=')) {
+          caption = line.substring(8).trim();
+        } else if (line.startsWith('Version=')) {
+          version = line.substring(8).trim();
+        }
+      });
+      
+      //根据版本号判断Windows版本
+      if (version.startsWith('10.0.')) {
+        const buildNumber = parseInt(version.split('.')[2]);
+        if (buildNumber >= 22000) {
+          detailedOSVersion = 'Windows 11';
+        } else {
+          detailedOSVersion = 'Windows 10';
+        }
+      } else if (version.startsWith('6.3')) {
+        detailedOSVersion = 'Windows 8.1';
+      } else if (version.startsWith('6.2')) {
+        detailedOSVersion = 'Windows 8';
+      } else if (version.startsWith('6.1')) {
+        detailedOSVersion = 'Windows 7';
+      } else {
+        detailedOSVersion = caption.replace('Microsoft ', '') || 'Windows';
+      }
+    } catch (error) {
+      console.warn('获取详细Windows版本信息失败:', error);
+      detailedOSVersion = 'Windows';
+    }
+  } else {
+    detailedOSVersion = os.type();
+  }
+  
   return {
     platform: process.platform,
     arch: process.arch,
     nodeVersion: process.version,
     electronVersion: process.versions.electron,
     osVersion: os.release(),
+    detailedOSVersion: detailedOSVersion,
     totalMemory: os.totalmem(),
     freeMemory: os.freemem()
   }

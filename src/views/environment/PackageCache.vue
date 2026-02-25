@@ -28,20 +28,34 @@
         </div>
       </template>
 
-      <!-- 加载中 -->
-      <div v-if="scanning && caches.length === 0" class="loading-state">
-        <el-icon class="is-loading" :size="24"><Loading /></el-icon>
-        <span>正在扫描各包管理器缓存...</span>
+      <!-- 扫描日志 -->
+      <div v-if="scanning" class="scanning-logs">
+        <div class="logs-header">
+          <el-icon class="is-loading" :size="20"><Loading /></el-icon>
+          <span>正在扫描各包管理器缓存...</span>
+        </div>
+        <div class="logs-content">
+          <div 
+            v-for="(log, index) in scanLogs" 
+            :key="index" 
+            class="log-item"
+            :class="getLogClass(log)"
+          >
+            {{ log }}
+          </div>
+        </div>
       </div>
 
       <!-- 缓存列表 -->
-      <div v-else class="cache-grid">
+      <div v-else-if="caches.length > 0" class="cache-grid">
+        <!-- 现有的缓存列表内容 -->
         <div
           v-for="item in caches"
           :key="item.manager"
           class="cache-card"
           :class="{ unavailable: !item.available }"
         >
+          <!-- 缓存项内容保持不变 -->
           <div class="cache-card-header">
             <div class="cache-name">
               <el-icon :size="20" :color="item.available ? managerColors[item.manager] : '#c0c4cc'">
@@ -91,6 +105,15 @@
           </div>
         </div>
       </div>
+
+      <!-- 空状态 -->
+      <div v-else class="empty-state">
+        <el-icon :size="48" color="#c0c4cc"><Box /></el-icon>
+        <p>暂无缓存数据</p>
+        <el-button type="primary" :icon="Refresh" @click="scanCaches">
+          立即扫描
+        </el-button>
+      </div>
     </el-card>
 
     <!-- 操作日志弹窗 -->
@@ -104,7 +127,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   Refresh, Delete,
@@ -124,6 +147,7 @@ const cleaningManager = ref('')
 const logVisible = ref(false)
 const logContent = ref('')
 const caches = ref<CacheItem[]>([])
+const scanLogs = ref<string[]>([])
 
 const managerLabels: Record<string, string> = {
   npm: 'npm',
@@ -199,8 +223,64 @@ function copyPath(p: string) {
   ElMessage.success('路径已复制')
 }
 
+function getLogClass(log: string): string {
+  if (log.startsWith('🟢') || log.includes('[完成]') || log.includes('成功')) return 'log-success'
+  if (log.startsWith('🔴') || log.includes('[错误]') || log.includes('失败') || log.includes('错误') || log.includes('异常')) return 'log-error'
+  if (log.startsWith('🟡') || log.includes('警告') || log.includes('未找到')) return 'log-warning'
+  if (log.startsWith('  ')) return 'log-detail' // 详细信息使用特殊样式
+  return 'log-info'
+}
+
 async function scanCaches() {
   scanning.value = true
+  scanLogs.value = ['[开始] 正在扫描各包管理器缓存...']
+  // 清空现有缓存数据，确保显示扫描过程
+  caches.value = []
+  
+  // 监听日志更新
+  const logListener = (log: any) => {
+    // 只处理包缓存相关的日志
+    if (log.category === 'cache') {
+      // 格式化日志显示
+      let formattedLog = ''
+      if (log.level === 'info') {
+        formattedLog = `🟢 ${log.message}`
+      } else if (log.level === 'warn') {
+        formattedLog = `🟡 ${log.message}`
+      } else if (log.level === 'error') {
+        formattedLog = `🔴 ${log.message}`
+      } else {
+        formattedLog = `⚪ ${log.message}`
+      }
+      
+      // 添加详细信息（如果有的话）
+      if (log.detail && log.detail.trim()) {
+        const details = log.detail.split('\n').filter((line: string) => line.trim())
+        details.forEach((detail: string) => {
+          scanLogs.value.push(`  ${detail}`)
+        })
+      }
+      
+      scanLogs.value.push(formattedLog)
+      
+      // 保持最新的100条日志
+      if (scanLogs.value.length > 100) {
+        scanLogs.value = scanLogs.value.slice(-100)
+      }
+      
+      // 强制更新DOM
+      nextTick(() => {
+        const logsContent = document.querySelector('.logs-content')
+        if (logsContent) {
+          logsContent.scrollTop = logsContent.scrollHeight
+        }
+      })
+    }
+  }
+  
+  // 添加日志监听器
+  window.electronAPI.onNewLog(logListener)
+  
   try {
     const result = await window.electronAPI.scanPackageCaches()
     if (result.success) {
@@ -209,11 +289,18 @@ async function scanCaches() {
         if (a.available !== b.available) return a.available ? -1 : 1
         return b.size - a.size
       })
+      scanLogs.value.push('🟢 [完成] 包缓存扫描完成')
     }
   } catch (e: any) {
     ElMessage.error('扫描失败: ' + e.message)
+    scanLogs.value.push('🔴 [错误] 扫描失败: ' + e.message)
+  } finally {
+    scanning.value = false
+    // 延迟清除监听器，确保最后的日志能被接收到
+    setTimeout(() => {
+      window.electronAPI.onNewLog(() => {})
+    }, 1000)
   }
-  scanning.value = false
 }
 
 async function cleanCache(item: CacheItem) {
@@ -320,20 +407,97 @@ onMounted(() => {
   font-size: 14px;
 }
 
-.loading-state {
+.scanning-logs {
+  padding: 20px;
+  background: #f5f7fa;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.logs-header {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 10px;
-  padding: 80px 0;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e4e7ed;
+  color: #303133;
+  font-weight: 600;
+}
+
+.logs-content {
+  max-height: 300px;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 4px;
+  padding: 12px;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 13px;
+}
+
+.log-item {
+  padding: 4px 8px;
+  margin-bottom: 2px;
+  border-radius: 3px;
+  line-height: 1.4;
+  word-break: break-all;
+}
+
+.log-item:last-child {
+  margin-bottom: 0;
+}
+
+.log-success {
+  background: #f0f9ff;
+  color: #0960bd;
+  border-left: 3px solid #409eff;
+}
+
+.log-error {
+  background: #fef0f0;
+  color: #c45656;
+  border-left: 3px solid #f56c6c;
+}
+
+.log-warning {
+  background: #fdf6ec;
+  color: #d89614;
+  border-left: 3px solid #e6a23c;
+}
+
+.log-info {
+  background: #f4f4f5;
+  color: #606266;
+  border-left: 3px solid #909399;
+}
+
+.log-detail {
+  background: #fafafa;
   color: #909399;
-  font-size: 14px;
+  border-left: 3px solid #c0c4cc;
+  font-size: 12px;
+  padding-left: 16px;
 }
 
 .cache-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 16px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  color: #909399;
+  text-align: center;
+}
+
+.empty-state p {
+  margin: 16px 0;
+  font-size: 16px;
 }
 
 .cache-card {

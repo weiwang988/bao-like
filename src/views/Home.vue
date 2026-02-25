@@ -149,6 +149,81 @@ const getSystemInfo = async () => {
       systemInfo.value.platform = navigator.platform.toLowerCase();
     }
     
+    // 获取详细的Windows版本信息
+    try {
+      // 使用更可靠的命令获取Windows版本
+      const winVerCmd = await window.electronAPI.execCommand('wmic os get Caption,Version /value');
+      if (winVerCmd.success) {
+        const output = winVerCmd.output;
+        console.log('WMIC OS output:', output);
+        
+        // 解析输出
+        const lines = output.split('\n').filter(line => line.trim());
+        let caption = '';
+        let version = '';
+        
+        lines.forEach(line => {
+          if (line.startsWith('Caption=')) {
+            caption = line.substring(8).trim();
+          } else if (line.startsWith('Version=')) {
+            version = line.substring(8).trim();
+          }
+        });
+        
+        console.log('Caption:', caption, 'Version:', version);
+        
+        // 根据版本号判断Windows版本
+        if (version.startsWith('10.0.')) {
+          // Windows 10/11 都是 10.0.x 版本，需要进一步判断
+          if (caption.includes('Windows 11') || caption.includes('11')) {
+            systemInfo.value.os = 'Windows 11';
+          } else if (caption.includes('Windows 10') || caption.includes('10')) {
+            systemInfo.value.os = 'Windows 10';
+          } else {
+            // 通过版本号范围判断
+            const buildNumber = parseInt(version.split('.')[2]);
+            if (buildNumber >= 22000) {
+              systemInfo.value.os = 'Windows 11';
+            } else {
+              systemInfo.value.os = 'Windows 10';
+            }
+          }
+        } else if (version.startsWith('6.3')) {
+          systemInfo.value.os = 'Windows 8.1';
+        } else if (version.startsWith('6.2')) {
+          systemInfo.value.os = 'Windows 8';
+        } else if (version.startsWith('6.1')) {
+          systemInfo.value.os = 'Windows 7';
+        } else {
+          // 回退到原来的systeminfo命令
+          const systemInfoCmd = await window.electronAPI.execCommand('systeminfo | findstr "OS Name"');
+          if (systemInfoCmd.success) {
+            const osNameLine = systemInfoCmd.output.trim();
+            console.log('OS Name line:', osNameLine);
+            // 提取Windows版本信息
+            if (osNameLine.includes('Windows 11') || osNameLine.includes('11')) {
+              systemInfo.value.os = 'Windows 11';
+            } else if (osNameLine.includes('Windows 10') || osNameLine.includes('10')) {
+              systemInfo.value.os = 'Windows 10';
+            } else if (osNameLine.includes('Windows Server 2022')) {
+              systemInfo.value.os = 'Windows Server 2022';
+            } else if (osNameLine.includes('Windows Server 2019')) {
+              systemInfo.value.os = 'Windows Server 2019';
+            } else if (osNameLine.includes('Windows Server 2016')) {
+              systemInfo.value.os = 'Windows Server 2016';
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('获取详细Windows版本信息失败:', error);
+      // 最后的回退方案
+      systemInfo.value.os = 'Windows';
+    }
+    
+    // 添加调试信息
+    console.log('最终系统信息:', systemInfo.value);
+    
     // 获取系统架构和内存信息
     // 通过执行命令获取系统架构
     const archInfo = await window.electronAPI.execCommand('echo %PROCESSOR_ARCHITECTURE%');
@@ -200,6 +275,16 @@ const getSystemInfo = async () => {
       freeMem: 0
     };
   }
+  
+  // 添加最终的调试信息
+  console.log('=== 最终系统信息 ===');
+  console.log('操作系统:', systemInfo.value.os);
+  console.log('架构:', systemInfo.value.arch);
+  console.log('Node.js版本:', systemInfo.value.nodeVersion);
+  console.log('Electron版本:', systemInfo.value.electronVersion);
+  console.log('平台:', systemInfo.value.platform);
+  console.log('总内存:', systemInfo.value.totalMem, 'GB');
+  console.log('空闲内存:', systemInfo.value.freeMem, 'GB');
 };
 
 const refreshStats = async () => {
