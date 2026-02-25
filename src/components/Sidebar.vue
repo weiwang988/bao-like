@@ -5,7 +5,7 @@ import { routes } from '@/router'
 import { 
   HomeFilled, Setting, InfoFilled, Fold, Expand,
   Grid, Files, FolderChecked, SetUp, Box, Document, Coin, FolderDelete,
-  Monitor, Cpu, Connection
+  Monitor, Cpu, Connection, Notebook
 } from '@element-plus/icons-vue'
 
 const props = defineProps<{
@@ -33,7 +33,8 @@ const iconMap: Record<string, any> = {
   FolderDelete,
   Monitor,
   Cpu,
-  Connection
+  Connection,
+  Notebook
 }
 
 const menuItems = computed(() => {

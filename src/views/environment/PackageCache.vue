@@ -274,7 +274,9 @@ async function cleanAll() {
 }
 
 onMounted(() => {
-  scanCaches()
+  // 页面加载时不自动扫描，改为手动点击刷新按钮触发
+  // 初始化空的缓存列表
+  caches.value = []
 })
 </script>
 

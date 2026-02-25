@@ -37,6 +37,20 @@ async function initStore() {
 }
 
 function createWindow() {
+  //确定图标路径
+  let iconPath = ''
+  if (process.env.NODE_ENV === 'development') {
+    // 开发环境：项目根目录下的public文件夹
+    iconPath = path.join(__dirname, '../public/icon.ico')
+  } else {
+    // 生产环境：应用程序资源目录
+    iconPath = path.join(__dirname, '../resources/icon.ico')
+  }
+  
+  //调信息
+  console.log('图标路径:', iconPath)
+  console.log('图标文件存在:', require('fs').existsSync(iconPath))
+  
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
@@ -45,6 +59,7 @@ function createWindow() {
     frame: false,
     transparent: false,
     resizable: true,
+    icon: iconPath, // 设置窗口图标
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
