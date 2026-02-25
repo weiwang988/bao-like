@@ -54,5 +54,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.on('new-log', (event, log) => {
       callback(log)
     })
-  }
+  },
+  
+  // 系统信息
+  getSystemInfo: () => ipcRenderer.invoke('get-system-info'),
+  
+  // 开机启动
+  setAutoStart: (enable) => ipcRenderer.invoke('set-auto-start', enable)
 })

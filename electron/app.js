@@ -158,10 +158,56 @@ ipcMain.handle('exec-command', (event, command) => {
   })
 })
 
+// 获取系统信息
+ipcMain.handle('get-system-info', async () => {
+  const os = require('os')
+  return {
+    platform: process.platform,
+    arch: process.arch,
+    nodeVersion: process.version,
+    electronVersion: process.versions.electron,
+    osVersion: os.release(),
+    totalMemory: os.totalmem(),
+    freeMemory: os.freemem()
+  }
+})
+
+// 设置开机启动
+ipcMain.handle('set-auto-start', async (event, enable) => {
+  const AutoLaunch = (await import('auto-launch')).default
+  
+  try {
+    const autoLaunch = new AutoLaunch({
+      name: 'BaoLike',
+      path: app.getPath('exe')
+    })
+    
+    if (enable) {
+      await autoLaunch.enable()
+    } else {
+      await autoLaunch.disable()
+    }
+    
+    return true
+  } catch (error) {
+    console.error('设置开机启动失败:', error)
+    return false
+  }
+})
+
 // 初始化应用
 async function initializeApp() {
   // 初始化存储
   await initStore()
+  
+  // 保存应用信息到存储
+  if (store) {
+    store.set('packageInfo', {
+      name: 'BaoLike',
+      version: '1.0.0',
+      description: 'Electron + Vue3 + Vite Application'
+    })
+  }
   
   // 创建主窗口
   createWindow()

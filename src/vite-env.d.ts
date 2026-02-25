@@ -150,6 +150,16 @@ interface ClearLogsResult {
   success: boolean
 }
 
+interface SystemInfo {
+  platform: string
+  arch: string
+  nodeVersion: string
+  electronVersion: string
+  osVersion: string
+  totalMemory: number
+  freeMemory: number
+}
+
 interface Window {
   electronAPI: {
     minimize: () => void
@@ -177,5 +187,7 @@ interface Window {
     clearLogs: () => Promise<ClearLogsResult>
     addLog: (level: string, category: string, message: string, detail?: string) => Promise<AddLogResult>
     onNewLog: (callback: (log: LogItem) => void) => void
+    getSystemInfo: () => Promise<SystemInfo>
+    setAutoStart: (enable: boolean) => Promise<boolean>
   }
 }
