@@ -1,17 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { InfoFilled, Link, Warning, Promotion } from '@element-plus/icons-vue'
-
-interface SystemInfo {
-  platform: string;
-  arch: string;
-  version: string;
-  userAgent: string;
-}
-
 const appVersion = ref('1.0.0');
 const githubUrl = ref('https://github.com/weiwang988/bao-like');
-const systemInfo = ref<SystemInfo | null>(null);
 const loading = ref(true);
 
 onMounted(() => {

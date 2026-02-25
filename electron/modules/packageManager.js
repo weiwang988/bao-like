@@ -422,67 +422,129 @@ module.exports = function setupPackageManager(logger) {
         case 'npm': {
           // npm 自己知道缓存在哪里
           const cmd = 'npm config get cache'
-          if (scanDetails) scanDetails.push(`  命令: ${cmd}`)
+          if (scanDetails) scanDetails.push(`  执行命令: ${cmd}`)
+          const startTime = Date.now()
           const r = await execPromise(cmd, 10000)
+          const duration = Date.now() - startTime
+          
+          if (scanDetails) {
+            scanDetails.push(`  执行耗时: ${duration}ms`)
+            if (r.success && r.output && r.output !== 'undefined') {
+              scanDetails.push(`  命令输出: ${r.output.trim()}`)
+            } else {
+              scanDetails.push(`  执行失败:`)
+              scanDetails.push(`    错误信息: ${r.error || '命令执行异常'}`)
+              if (r.output) scanDetails.push(`    输出内容: ${r.output}`)
+            }
+          }
+          
           if (r.success && r.output && r.output !== 'undefined') {
             const cachePath = r.output.trim()
-            if (scanDetails) scanDetails.push(`  输出: ${cachePath}`)
+            if (scanDetails) scanDetails.push(`  解析路径: ${cachePath}`)
             if (fs.existsSync(cachePath)) {
-              if (scanDetails) scanDetails.push(`  结果: 路径存在`)
+              const size = getDirSize(cachePath)
+              if (scanDetails) scanDetails.push(`  路径验证: 存在 (大小: ${(size / 1024 / 1024).toFixed(2)} MB)`)
               return cachePath
             } else {
-              if (scanDetails) scanDetails.push(`  结果: 路径不存在`)
+              if (scanDetails) scanDetails.push(`  路径验证: 不存在`)
             }
           } else {
-            if (scanDetails) scanDetails.push(`  结果: 命令执行失败`)
+            if (scanDetails) scanDetails.push(`  检测结果: 失败`)
           }
           return ''
         }
         case 'pnpm': {
           // pnpm store path 返回实际存储路径
           const cmd = 'pnpm store path'
-          if (scanDetails) scanDetails.push(`  命令: ${cmd}`)
+          if (scanDetails) scanDetails.push(`  执行命令: ${cmd}`)
+          const startTime = Date.now()
           const r = await execPromise(cmd, 10000)
+          const duration = Date.now() - startTime
+          
+          if (scanDetails) {
+            scanDetails.push(`  执行耗时: ${duration}ms`)
+            if (r.success && r.output) {
+              scanDetails.push(`  命令输出: ${r.output.trim()}`)
+            } else {
+              scanDetails.push(`  执行失败:`)
+              scanDetails.push(`    错误信息: ${r.error || '命令执行异常'}`)
+              if (r.output) scanDetails.push(`    输出内容: ${r.output}`)
+            }
+          }
+          
           if (r.success && r.output) {
             const storePath = r.output.trim()
-            if (scanDetails) scanDetails.push(`  输出: ${storePath}`)
+            if (scanDetails) scanDetails.push(`  解析路径: ${storePath}`)
             if (fs.existsSync(storePath)) {
-              if (scanDetails) scanDetails.push(`  结果: 路径存在`)
+              const size = getDirSize(storePath)
+              if (scanDetails) scanDetails.push(`  路径验证: 存在 (大小: ${(size / 1024 / 1024).toFixed(2)} MB)`)
               return storePath
             } else {
-              if (scanDetails) scanDetails.push(`  结果: 路径不存在`)
+              if (scanDetails) scanDetails.push(`  路径验证: 不存在`)
             }
           } else {
-            if (scanDetails) scanDetails.push(`  结果: 命令执行失败`)
+            if (scanDetails) scanDetails.push(`  检测结果: 失败`)
           }
           return ''
         }
         case 'yarn': {
           // yarn 1.x 和 yarn 2+ 都支持 cache dir
           const cmd1 = 'yarn cache dir'
-          if (scanDetails) scanDetails.push(`  命令: ${cmd1}`)
+          if (scanDetails) scanDetails.push(`  执行命令 (尝试1): ${cmd1}`)
+          const startTime1 = Date.now()
           let r = await execPromise(cmd1, 10000)
+          const duration1 = Date.now() - startTime1
+          
+          if (scanDetails) {
+            scanDetails.push(`  执行耗时: ${duration1}ms`)
+            if (r.success && r.output) {
+              scanDetails.push(`  命令输出: ${r.output.trim()}`)
+            } else {
+              scanDetails.push(`  执行失败:`)
+              scanDetails.push(`    错误信息: ${r.error || '命令执行异常'}`)
+              if (r.output) scanDetails.push(`    输出内容: ${r.output}`)
+            }
+          }
+          
           if (r.success && r.output) {
             const cachePath = r.output.trim()
-            if (scanDetails) scanDetails.push(`  输出: ${cachePath}`)
+            if (scanDetails) scanDetails.push(`  解析路径: ${cachePath}`)
             if (fs.existsSync(cachePath)) {
-              if (scanDetails) scanDetails.push(`  结果: 路径存在`)
+              const size = getDirSize(cachePath)
+              if (scanDetails) scanDetails.push(`  路径验证: 存在 (大小: ${(size / 1024 / 1024).toFixed(2)} MB)`)
               return cachePath
             }
           }
+          
           // yarn 2+ (berry) 使用不同命令
           const cmd2 = 'yarn config get cacheFolder'
-          if (scanDetails) scanDetails.push(`  命令: ${cmd2}`)
+          if (scanDetails) scanDetails.push(`  执行命令 (尝试2): ${cmd2}`)
+          const startTime2 = Date.now()
           r = await execPromise(cmd2, 10000)
+          const duration2 = Date.now() - startTime2
+          
+          if (scanDetails) {
+            scanDetails.push(`  执行耗时: ${duration2}ms`)
+            if (r.success && r.output && !r.output.includes('undefined')) {
+              scanDetails.push(`  命令输出: ${r.output.trim()}`)
+            } else {
+              scanDetails.push(`  执行失败:`)
+              scanDetails.push(`    错误信息: ${r.error || '命令执行异常'}`)
+              if (r.output) scanDetails.push(`    输出内容: ${r.output}`)
+            }
+          }
+          
           if (r.success && r.output && !r.output.includes('undefined')) {
             const cachePath = r.output.trim()
-            if (scanDetails) scanDetails.push(`  输出: ${cachePath}`)
+            if (scanDetails) scanDetails.push(`  解析路径: ${cachePath}`)
             if (fs.existsSync(cachePath)) {
-              if (scanDetails) scanDetails.push(`  结果: 路径存在`)
+              const size = getDirSize(cachePath)
+              if (scanDetails) scanDetails.push(`  路径验证: 存在 (大小: ${(size / 1024 / 1024).toFixed(2)} MB)`)
               return cachePath
             }
           }
-          if (scanDetails) scanDetails.push(`  结果: 未找到缓存目录`)
+          
+          if (scanDetails) scanDetails.push(`  检测结果: 未找到缓存目录`)
           return ''
         }
         case 'pip': {
@@ -494,19 +556,41 @@ module.exports = function setupPackageManager(logger) {
             'python -m pip cache dir',
             'python3 -m pip cache dir'
           ]
-          for (const cmd of cmds) {
-            if (scanDetails) scanDetails.push(`  命令: ${cmd}`)
+          
+          for (let i = 0; i < cmds.length; i++) {
+            const cmd = cmds[i]
+            if (scanDetails) scanDetails.push(`  执行命令 (尝试${i + 1}/${cmds.length}): ${cmd}`)
+            const startTime = Date.now()
             const r = await execPromise(cmd, 10000)
-            if (r.success && r.output) {
-              const cachePath = r.output.trim()
-              if (scanDetails) scanDetails.push(`  输出: ${cachePath}`)
-              if (fs.existsSync(cachePath)) {
-                if (scanDetails) scanDetails.push(`  结果: 路径存在`)
-                return cachePath
+            const duration = Date.now() - startTime
+            
+            if (scanDetails) {
+              scanDetails.push(`  执行耗时: ${duration}ms`)
+              if (r.success && r.output) {
+                scanDetails.push(`  命令输出: ${r.output.trim()}`)
+              } else {
+                scanDetails.push(`  执行失败:`)
+                scanDetails.push(`    错误信息: ${r.error || '命令执行异常'}`)
+                if (r.output) scanDetails.push(`    输出内容: ${r.output}`)
               }
             }
+            
+            if (r.success && r.output) {
+              const cachePath = r.output.trim()
+              if (scanDetails) scanDetails.push(`  解析路径: ${cachePath}`)
+              if (fs.existsSync(cachePath)) {
+                const size = getDirSize(cachePath)
+                if (scanDetails) scanDetails.push(`  路径验证: 存在 (大小: ${(size / 1024 / 1024).toFixed(2)} MB)`)
+                return cachePath
+              } else {
+                if (scanDetails) scanDetails.push(`  路径验证: 不存在`)
+              }
+            } else {
+              if (scanDetails) scanDetails.push(`  当前命令检测失败，继续尝试下一个`)
+            }
           }
-          if (scanDetails) scanDetails.push(`  结果: 所有命令均失败`)
+          
+          if (scanDetails) scanDetails.push(`  检测结果: 所有命令均失败`)
           return ''
         }
         case 'conda': {
@@ -716,25 +800,43 @@ module.exports = function setupPackageManager(logger) {
     const scanDetails = []
 
     addLog('info', 'cache', '开始扫描包缓存', `扫描目标: ${managers.join(', ')}`)
+    scanDetails.push('=== 包缓存扫描详细过程 ===')
 
+    const totalStartTime = Date.now()
+    
     await Promise.all(managers.map(async (mgr) => {
+      const mgrStartTime = Date.now()
+      scanDetails.push(`\n[${mgr.toUpperCase()}] 开始检测缓存目录`)
+      
       try {
-        const cachePath = await getCachePath(mgr)
+        const cachePath = await getCachePath(mgr, scanDetails)
+        const mgrDuration = Date.now() - mgrStartTime
+        
         if (cachePath && fs.existsSync(cachePath)) {
           const size = getDirSize(cachePath)
           results.push({ manager: mgr, path: cachePath, size, available: true })
-          scanDetails.push(`[${mgr}] 找到缓存: ${cachePath} (${(size / 1024 / 1024).toFixed(2)} MB)`)
+          scanDetails.push(`[${mgr.toUpperCase()}] 检测完成: 成功 (耗时: ${mgrDuration}ms)`)
+          scanDetails.push(`  缓存路径: ${cachePath}`)
+          scanDetails.push(`  缓存大小: ${(size / 1024 / 1024).toFixed(2)} MB`)
         } else {
           results.push({ manager: mgr, path: '', size: 0, available: false })
-          scanDetails.push(`[${mgr}] 未找到缓存目录`)
+          scanDetails.push(`[${mgr.toUpperCase()}] 检测完成: 未找到 (耗时: ${mgrDuration}ms)`)
         }
       } catch (e) {
+        const mgrDuration = Date.now() - mgrStartTime
         results.push({ manager: mgr, path: '', size: 0, available: false })
-        scanDetails.push(`[${mgr}] 扫描出错: ${e.message}`)
+        scanDetails.push(`[${mgr.toUpperCase()}] 检测完成: 异常 (耗时: ${mgrDuration}ms)`)
+        scanDetails.push(`  错误信息: ${e.message}`)
       }
     }))
 
+    const totalDuration = Date.now() - totalStartTime
     const availableCount = results.filter(r => r.available).length
+    
+    scanDetails.push(`\n=== 扫描完成 ===`)
+    scanDetails.push(`总耗时: ${totalDuration}ms`)
+    scanDetails.push(`成功检测: ${availableCount}/${managers.length} 个包管理器`)
+    
     addLog('info', 'cache', `包缓存扫描完成: 找到 ${availableCount}/${managers.length} 个`, scanDetails.join('\n'))
 
     return { success: true, caches: results }
