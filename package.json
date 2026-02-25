@@ -1,0 +1,52 @@
+{
+  "name": "bao-like",
+  "version": "1.0.0",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview",
+    "electron:dev": "concurrently \"vite\" \"wait-on tcp:5173 && cross-env NODE_ENV=development electron .\"",
+    "electron:build": "npm run build && electron-builder",
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "BaoLike - Electron + Vue3 + Vite Application",
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.3.2",
+    "electron-store": "^11.0.2",
+    "element-plus": "^2.13.2",
+    "vue": "^3.5.28",
+    "vue-router": "^5.0.3"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.4",
+    "concurrently": "^9.2.1",
+    "cross-env": "^7.0.3",
+    "electron": "^40.6.0",
+    "electron-builder": "^26.8.1",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "vue-tsc": "^3.2.5",
+    "wait-on": "^9.0.4"
+  },
+  "build": {
+    "appId": "com.baolike.app",
+    "productName": "BaoLike",
+    "electronDist": "node_modules/electron/dist",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "win": {
+      "target": "dir",
+      "icon": "public/icon.ico",
+      "signAndEditExecutable": false
+    }
+  }
+}

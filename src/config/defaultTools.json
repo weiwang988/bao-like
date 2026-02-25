@@ -1,0 +1,453 @@
+{
+  "version": "1.0.0",
+  "description": "BaoLike 默认工具配置",
+  "categories": [
+    { "name": "编程语言", "icon": "Cpu" },
+    { "name": "包管理器", "icon": "Box" },
+    { "name": "版本管理器", "icon": "Switch" },
+    { "name": "开发工具", "icon": "Tools" },
+    { "name": "构建工具", "icon": "SetUp" },
+    { "name": "数据库", "icon": "Connection" }
+  ],
+  "tools": [
+    {
+      "name": "Java",
+      "command": "java -version",
+      "versionRegex": "version \"([\\d._]+)\"|openjdk ([\\d.]+)|java ([\\d.]+)",
+      "scanId": "java",
+      "exeNames": ["java"],
+      "versionArgs": "-version",
+      "website": "https://www.oracle.com/java/",
+      "downloadUrl": "https://adoptium.net/",
+      "category": "编程语言"
+    },
+    {
+      "name": "Python",
+      "command": "python --version",
+      "versionRegex": "Python\\s*([\\d.]+)",
+      "scanId": "python",
+      "exeNames": ["python", "python3", "py"],
+      "versionArgs": "--version",
+      "website": "https://www.python.org/",
+      "downloadUrl": "https://www.python.org/downloads/",
+      "category": "编程语言"
+    },
+    {
+      "name": "Node.js",
+      "command": "node -v",
+      "versionRegex": "v?([\\d.]+)",
+      "scanId": "node",
+      "exeNames": ["node"],
+      "versionArgs": "-v",
+      "website": "https://nodejs.org/",
+      "downloadUrl": "https://nodejs.org/en/download/",
+      "category": "编程语言"
+    },
+    {
+      "name": "Go",
+      "command": "go version",
+      "versionRegex": "go([\\d.]+)",
+      "scanId": "go",
+      "exeNames": ["go"],
+      "versionArgs": "version",
+      "website": "https://go.dev/",
+      "downloadUrl": "https://go.dev/dl/",
+      "category": "编程语言"
+    },
+    {
+      "name": "Rust",
+      "command": "rustc --version",
+      "versionRegex": "rustc\\s+([\\d.]+)",
+      "scanId": "rust",
+      "exeNames": ["rustc"],
+      "versionArgs": "--version",
+      "website": "https://www.rust-lang.org/",
+      "downloadUrl": "https://www.rust-lang.org/tools/install",
+      "category": "编程语言"
+    },
+    {
+      "name": "Ruby",
+      "command": "ruby -v",
+      "versionRegex": "ruby\\s+([\\d.]+)",
+      "scanId": "ruby",
+      "exeNames": ["ruby"],
+      "versionArgs": "-v",
+      "website": "https://www.ruby-lang.org/",
+      "downloadUrl": "https://www.ruby-lang.org/en/downloads/",
+      "category": "编程语言"
+    },
+    {
+      "name": "PHP",
+      "command": "php -v",
+      "versionRegex": "PHP\\s+([\\d.]+)",
+      "scanId": "php",
+      "exeNames": ["php"],
+      "versionArgs": "-v",
+      "website": "https://www.php.net/",
+      "downloadUrl": "https://www.php.net/downloads",
+      "category": "编程语言"
+    },
+    {
+      "name": ".NET",
+      "command": "dotnet --version",
+      "versionRegex": "([\\d.]+)",
+      "scanId": "dotnet",
+      "exeNames": ["dotnet"],
+      "versionArgs": "--version",
+      "website": "https://dotnet.microsoft.com/",
+      "downloadUrl": "https://dotnet.microsoft.com/download",
+      "category": "编程语言"
+    },
+    {
+      "name": "Dart",
+      "command": "dart --version",
+      "versionRegex": "Dart SDK version:\\s*([\\d.]+)",
+      "exeNames": ["dart"],
+      "versionArgs": "--version",
+      "website": "https://dart.dev/",
+      "downloadUrl": "https://dart.dev/get-dart",
+      "category": "编程语言"
+    },
+    {
+      "name": "Deno",
+      "command": "deno --version",
+      "versionRegex": "deno\\s+([\\d.]+)",
+      "scanId": "deno",
+      "exeNames": ["deno"],
+      "versionArgs": "--version",
+      "website": "https://deno.land/",
+      "downloadUrl": "https://deno.land/#installation",
+      "category": "编程语言"
+    },
+    {
+      "name": "Bun",
+      "command": "bun --version",
+      "versionRegex": "([\\d.]+)",
+      "scanId": "bun",
+      "exeNames": ["bun"],
+      "versionArgs": "--version",
+      "website": "https://bun.sh/",
+      "downloadUrl": "https://bun.sh/",
+      "category": "编程语言"
+    },
+    {
+      "name": "npm",
+      "command": "npm -v",
+      "versionRegex": "([\\d.]+)",
+      "exeNames": ["npm"],
+      "versionArgs": "-v",
+      "website": "https://www.npmjs.com/",
+      "downloadUrl": "https://nodejs.org/",
+      "category": "包管理器"
+    },
+    {
+      "name": "pnpm",
+      "command": "pnpm -v",
+      "versionRegex": "([\\d.]+)",
+      "exeNames": ["pnpm"],
+      "versionArgs": "-v",
+      "website": "https://pnpm.io/",
+      "downloadUrl": "https://pnpm.io/installation",
+      "category": "包管理器"
+    },
+    {
+      "name": "yarn",
+      "command": "yarn -v",
+      "versionRegex": "([\\d.]+)",
+      "exeNames": ["yarn"],
+      "versionArgs": "-v",
+      "website": "https://yarnpkg.com/",
+      "downloadUrl": "https://yarnpkg.com/getting-started/install",
+      "category": "包管理器"
+    },
+    {
+      "name": "pip",
+      "command": "pip --version",
+      "versionRegex": "pip\\s+([\\d.]+)",
+      "exeNames": ["pip", "pip3"],
+      "versionArgs": "--version",
+      "website": "https://pip.pypa.io/",
+      "downloadUrl": "https://pip.pypa.io/en/stable/installation/",
+      "category": "包管理器"
+    },
+    {
+      "name": "Maven",
+      "command": "mvn -v",
+      "versionRegex": "Apache Maven\\s+([\\d.]+)",
+      "exeNames": ["mvn"],
+      "versionArgs": "-v",
+      "website": "https://maven.apache.org/",
+      "downloadUrl": "https://maven.apache.org/download.cgi",
+      "category": "包管理器"
+    },
+    {
+      "name": "Gradle",
+      "command": "gradle -v",
+      "versionRegex": "Gradle\\s+([\\d.]+)",
+      "exeNames": ["gradle"],
+      "versionArgs": "-v",
+      "website": "https://gradle.org/",
+      "downloadUrl": "https://gradle.org/install/",
+      "category": "包管理器"
+    },
+    {
+      "name": "Cargo",
+      "command": "cargo --version",
+      "versionRegex": "cargo\\s+([\\d.]+)",
+      "scanId": "rust",
+      "exeNames": ["cargo"],
+      "versionArgs": "--version",
+      "website": "https://doc.rust-lang.org/cargo/",
+      "downloadUrl": "https://www.rust-lang.org/tools/install",
+      "category": "包管理器"
+    },
+    {
+      "name": "Composer",
+      "command": "composer --version",
+      "versionRegex": "Composer version\\s+([\\d.]+)",
+      "exeNames": ["composer"],
+      "versionArgs": "--version",
+      "website": "https://getcomposer.org/",
+      "downloadUrl": "https://getcomposer.org/download/",
+      "category": "包管理器"
+    },
+    {
+      "name": "Conda",
+      "command": "conda --version",
+      "versionRegex": "conda\\s+([\\d.]+)",
+      "exeNames": ["conda"],
+      "versionArgs": "--version",
+      "website": "https://docs.conda.io/",
+      "downloadUrl": "https://docs.conda.io/en/latest/miniconda.html",
+      "category": "包管理器"
+    },
+    {
+      "name": "uv",
+      "command": "uv --version",
+      "versionRegex": "uv\\s+([\\d.]+)",
+      "exeNames": ["uv"],
+      "versionArgs": "--version",
+      "website": "https://github.com/astral-sh/uv",
+      "downloadUrl": "https://docs.astral.sh/uv/getting-started/installation/",
+      "category": "包管理器"
+    },
+    {
+      "name": "pipx",
+      "command": "pipx --version",
+      "versionRegex": "([\\d.]+)",
+      "exeNames": ["pipx"],
+      "versionArgs": "--version",
+      "website": "https://pipx.pypa.io/",
+      "downloadUrl": "https://pipx.pypa.io/stable/installation/",
+      "category": "包管理器"
+    },
+    {
+      "name": "Poetry",
+      "command": "poetry --version",
+      "versionRegex": "Poetry.*?([\\d.]+)",
+      "exeNames": ["poetry"],
+      "versionArgs": "--version",
+      "website": "https://python-poetry.org/",
+      "downloadUrl": "https://python-poetry.org/docs/#installation",
+      "category": "包管理器"
+    },
+    {
+      "name": "Git",
+      "command": "git --version",
+      "versionRegex": "git version\\s+([\\d.]+)",
+      "scanId": "git",
+      "exeNames": ["git"],
+      "versionArgs": "--version",
+      "website": "https://git-scm.com/",
+      "downloadUrl": "https://git-scm.com/downloads",
+      "category": "开发工具"
+    },
+    {
+      "name": "Docker",
+      "command": "docker -v",
+      "versionRegex": "Docker version\\s+([\\d.]+)",
+      "scanId": "docker",
+      "exeNames": ["docker"],
+      "versionArgs": "-v",
+      "website": "https://www.docker.com/",
+      "downloadUrl": "https://www.docker.com/products/docker-desktop/",
+      "category": "开发工具"
+    },
+    {
+      "name": "Docker Compose",
+      "command": "docker-compose -v",
+      "versionRegex": "version\\s+([\\d.]+)",
+      "exeNames": ["docker-compose"],
+      "versionArgs": "-v",
+      "website": "https://docs.docker.com/compose/",
+      "downloadUrl": "https://docs.docker.com/compose/install/",
+      "category": "开发工具"
+    },
+    {
+      "name": "kubectl",
+      "command": "kubectl version --client --short",
+      "versionRegex": "v([\\d.]+)",
+      "exeNames": ["kubectl"],
+      "versionArgs": "version --client --short",
+      "website": "https://kubernetes.io/",
+      "downloadUrl": "https://kubernetes.io/docs/tasks/tools/",
+      "category": "开发工具"
+    },
+    {
+      "name": "Flutter",
+      "command": "flutter --version",
+      "versionRegex": "Flutter\\s+([\\d.]+)",
+      "scanId": "flutter",
+      "exeNames": ["flutter"],
+      "versionArgs": "--version",
+      "website": "https://flutter.dev/",
+      "downloadUrl": "https://flutter.dev/docs/get-started/install",
+      "category": "开发工具"
+    },
+    {
+      "name": "SVN",
+      "command": "svn --version",
+      "versionRegex": "svn.*?version\\s+([\\d.]+)",
+      "exeNames": ["svn"],
+      "versionArgs": "--version",
+      "website": "https://subversion.apache.org/",
+      "downloadUrl": "https://subversion.apache.org/packages.html",
+      "category": "开发工具"
+    },
+    {
+      "name": "Podman",
+      "command": "podman -v",
+      "versionRegex": "podman version\\s+([\\d.]+)",
+      "exeNames": ["podman"],
+      "versionArgs": "-v",
+      "website": "https://podman.io/",
+      "downloadUrl": "https://podman.io/getting-started/installation",
+      "category": "开发工具"
+    },
+    {
+      "name": "nvm",
+      "command": "nvm version",
+      "versionRegex": "([\\d.]+)",
+      "exeNames": ["nvm"],
+      "versionArgs": "version",
+      "website": "https://github.com/nvm-sh/nvm",
+      "downloadUrl": "https://github.com/coreybutler/nvm-windows/releases",
+      "category": "版本管理器"
+    },
+    {
+      "name": "pyenv",
+      "command": "pyenv --version",
+      "versionRegex": "pyenv\\s+([\\d.]+)",
+      "exeNames": ["pyenv"],
+      "versionArgs": "--version",
+      "website": "https://github.com/pyenv/pyenv",
+      "downloadUrl": "https://github.com/pyenv-win/pyenv-win",
+      "category": "版本管理器"
+    },
+    {
+      "name": "rustup",
+      "command": "rustup --version",
+      "versionRegex": "rustup\\s+([\\d.]+)",
+      "exeNames": ["rustup"],
+      "versionArgs": "--version",
+      "website": "https://rustup.rs/",
+      "downloadUrl": "https://rustup.rs/",
+      "category": "版本管理器"
+    },
+    {
+      "name": "SDKMAN",
+      "command": "sdk version",
+      "versionRegex": "SDKMAN\\s+([\\d.]+)",
+      "exeNames": ["sdk"],
+      "versionArgs": "version",
+      "website": "https://sdkman.io/",
+      "downloadUrl": "https://sdkman.io/install",
+      "category": "版本管理器"
+    },
+    {
+      "name": "fnm",
+      "command": "fnm --version",
+      "versionRegex": "fnm\\s+([\\d.]+)",
+      "exeNames": ["fnm"],
+      "versionArgs": "--version",
+      "website": "https://github.com/Schniz/fnm",
+      "downloadUrl": "https://github.com/Schniz/fnm#installation",
+      "category": "版本管理器"
+    },
+    {
+      "name": "CMake",
+      "command": "cmake --version",
+      "versionRegex": "cmake version\\s+([\\d.]+)",
+      "exeNames": ["cmake"],
+      "versionArgs": "--version",
+      "website": "https://cmake.org/",
+      "downloadUrl": "https://cmake.org/download/",
+      "category": "构建工具"
+    },
+    {
+      "name": "Make",
+      "command": "make -v",
+      "versionRegex": "GNU Make\\s+([\\d.]+)",
+      "exeNames": ["make"],
+      "versionArgs": "-v",
+      "website": "https://www.gnu.org/software/make/",
+      "downloadUrl": "https://www.gnu.org/software/make/",
+      "category": "构建工具"
+    },
+    {
+      "name": "Ninja",
+      "command": "ninja --version",
+      "versionRegex": "([\\d.]+)",
+      "exeNames": ["ninja"],
+      "versionArgs": "--version",
+      "website": "https://ninja-build.org/",
+      "downloadUrl": "https://github.com/nicknisi/ninja/releases",
+      "category": "构建工具"
+    },
+    {
+      "name": "MySQL",
+      "command": "mysql --version",
+      "versionRegex": "Distrib\\s+([\\d.]+)|Ver\\s+([\\d.]+).*for|([\\d.]+)",
+      "scanId": "mysql",
+      "exeNames": ["mysql"],
+      "versionArgs": "--version",
+      "serviceName": "MySQL",
+      "website": "https://www.mysql.com/",
+      "downloadUrl": "https://dev.mysql.com/downloads/",
+      "category": "数据库"
+    },
+    {
+      "name": "PostgreSQL",
+      "command": "psql --version",
+      "versionRegex": "psql.*\\s+([\\d.]+)|([\\d.]+)",
+      "scanId": "postgresql",
+      "exeNames": ["psql"],
+      "versionArgs": "--version",
+      "website": "https://www.postgresql.org/",
+      "downloadUrl": "https://www.postgresql.org/download/",
+      "category": "数据库"
+    },
+    {
+      "name": "MongoDB",
+      "command": "mongod --version",
+      "versionRegex": "db version v([\\d.]+)",
+      "scanId": "mongodb",
+      "exeNames": ["mongod"],
+      "versionArgs": "--version",
+      "website": "https://www.mongodb.com/",
+      "downloadUrl": "https://www.mongodb.com/try/download/community",
+      "category": "数据库"
+    },
+    {
+      "name": "Redis",
+      "command": "redis-server --version",
+      "versionRegex": "v=([\\d.]+)",
+      "scanId": "redis",
+      "exeNames": ["redis-server"],
+      "versionArgs": "--version",
+      "website": "https://redis.io/",
+      "downloadUrl": "https://redis.io/download/",
+      "category": "数据库"
+    }
+  ]
+}
