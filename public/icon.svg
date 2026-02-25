@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!--背景圆 -->
+  <circle cx="128" cy="128" r="120" fill="#f0f8ff" stroke="#409EFF" stroke-width="8"/>
+  
+  <!-- 主要包盒图形 -->
+  <g transform="translate(64, 64)">
+    <!--底盒子 -->
+    <rect x="20" y="60" width="88" height="56" rx="8" fill="#409EFF" opacity="0.9"/>
+    <rect x="20" y="60" width="88" height="16" rx="8" fill="#337ecc"/>
+    
+    <!--盒开口 -->
+    <rect x="32" y="80" width="64" height="8" rx="4" fill="#ffffff" opacity="0.7"/>
+    
+    <!-- 顶部盖子 -->
+    <rect x="16" y="48" width="96" height="20" rx="6" fill="#E6A23C"/>
+    <rect x="20" y="52" width="88" height="8" rx="4" fill="#d48e2a"/>
+    
+    <!--点 -->
+    <circle cx="40" cy="58" r="3" fill="#ffffff" opacity="0.8"/>
+    <circle cx="88" cy="58" r="3" fill="#ffffff" opacity="0.8"/>
+  </g>
+  
+  <!--元素 -->
+  <circle cx="192" cy="48" r="12" fill="#67C23A" opacity="0.8"/>
+  <circle cx="192" cy="208" r="12" fill="#F56C6C" opacity="0.8"/>
+  <circle cx="48" cy="208" r="12" fill="#E6A23C" opacity="0.8"/>
+  
+  <!--应名称文字 (简化版) -->
+  <text x="128" y="240" font-family="Arial, sans-serif" font-size="24" font-weight="bold" 
+        text-anchor="middle" fill="#409EFF" opacity="0.7">BaoLike</text>
+</svg>
