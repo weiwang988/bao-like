@@ -75,6 +75,17 @@ npm run build:electron
 npm run electron:dev
 ```
 
+## 📷 项目截图
+
+### 环境配置模块
+
+<div align="center">
+  <img src="./screenshots/package-manager.png" alt="工具管理" width="45%" />
+  <img src="./screenshots/package-deps.png" alt="包管理" width="45%" />
+  <br/>
+  <img src="./screenshots/package-cache.png" alt="包缓存" width="45%" />
+</div>
+
 ## 📦 功能模块
 
 ### 软件管理
