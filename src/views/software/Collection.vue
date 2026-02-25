@@ -175,7 +175,22 @@ const form = reactive({ ...defaultForm })
 // 保存数据到 store
 const saveToStore = async () => {
   if (window.electronAPI?.storeSet) {
-    await window.electronAPI.storeSet('softwareList', softwareList.value)
+    try {
+      // 创建一个干净的副本，只包含基本数据类型
+      const cleanData = softwareList.value.map(software => ({
+        id: software.id,
+        icon: software.icon, //这应该已经是 base64 字符串
+        name: software.name,
+        websiteUrl: software.websiteUrl,
+        downloadUrl: software.downloadUrl,
+        backupUrl: software.backupUrl
+      }))
+      
+      await window.electronAPI.storeSet('softwareList', cleanData)
+    } catch (error) {
+      console.error('保存数据失败:', error)
+      ElMessage.error('保存数据失败: ' + (error as Error).message)
+    }
   }
 }
 

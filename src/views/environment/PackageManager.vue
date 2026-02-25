@@ -615,7 +615,17 @@ async function loadCustomPackages() {
 
 // 保存自定义包
 async function saveCustomPackages() {
-  await window.electronAPI.storeSet('customPackages', customPackages.value)
+  try {
+    // 创建干净的副本，确保 versionRegex 是字符串
+    const cleanData = customPackages.value.map(pkg => ({
+      ...pkg,
+      versionRegex: typeof pkg.versionRegex === 'string' ? pkg.versionRegex : (pkg.versionRegex as RegExp).toString()
+    }))
+    await window.electronAPI.storeSet('customPackages', cleanData)
+  } catch (error) {
+    console.error('保存自定义包失败:', error)
+    ElMessage.error('保存自定义包失败: ' + (error as Error).message)
+  }
 }
 
 // 加载已编辑的内置包
@@ -628,7 +638,20 @@ async function loadEditedBuiltinPackages() {
 
 // 保存已编辑的内置包
 async function saveEditedBuiltinPackages() {
-  await window.electronAPI.storeSet('editedBuiltinPackages', editedBuiltinPackages.value)
+  try {
+    // 创建干净的副本，确保所有 RegExp都为字符串
+    const cleanData: Record<string, any> = {}
+    for (const [key, pkg] of Object.entries(editedBuiltinPackages.value)) {
+      cleanData[key] = {
+        ...pkg,
+        versionRegex: typeof pkg.versionRegex === 'string' ? pkg.versionRegex : (pkg.versionRegex as RegExp).toString()
+      }
+    }
+    await window.electronAPI.storeSet('editedBuiltinPackages', cleanData)
+  } catch (error) {
+    console.error('保存已编辑包失败:', error)
+    ElMessage.error('保存已编辑包失败: ' + (error as Error).message)
+  }
 }
 
 // 页面加载时自动扫描
